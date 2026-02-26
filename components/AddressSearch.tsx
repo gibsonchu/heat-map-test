@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 
-interface GeoSearchResult {
+export interface GeoSearchResult {
   label: string;
   coordinates: [number, number]; // [lng, lat]
   borough?: string;

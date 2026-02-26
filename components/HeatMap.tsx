@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import Map, { Source, Layer, MapRef, MapMouseEvent } from 'react-map-gl/maplibre';
+import Map, { Source, Layer, Marker, MapRef, MapMouseEvent } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { fetchHviGeoJSON, NtaFeature, NtaGeoJSON } from '@/lib/data';
 import { getHviFillColor } from '@/lib/color-scale';
 import { Legend } from './Legend';
 import { NeighborhoodPopup } from './NeighborhoodPopup';
-import { AddressSearch } from './AddressSearch';
+import { AddressSearch, GeoSearchResult } from './AddressSearch';
 
 // Free CartoDB light basemap (no API key needed)
 const MAP_STYLE = {
@@ -49,6 +49,7 @@ export default function HeatMap() {
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<PopupState | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [searchMarker, setSearchMarker] = useState<GeoSearchResult | null>(null);
 
   // Load HVI + NTA data on mount
   useEffect(() => {
@@ -101,16 +102,14 @@ export default function HeatMap() {
     }
   }, []);
 
-  const handleAddressSelect = useCallback(
-    (result: { coordinates: [number, number] }) => {
-      mapRef.current?.flyTo({
-        center: result.coordinates,
-        zoom: 14,
-        duration: 1200,
-      });
-    },
-    []
-  );
+  const handleAddressSelect = useCallback((result: GeoSearchResult) => {
+    mapRef.current?.flyTo({
+      center: result.coordinates,
+      zoom: 14,
+      duration: 1200,
+    });
+    setSearchMarker(result);
+  }, []);
 
   const fillColor = getHviFillColor();
 
@@ -198,6 +197,26 @@ export default function HeatMap() {
             latitude={popup.latitude}
             onClose={() => setPopup(null)}
           />
+        )}
+
+        {/* Address search marker */}
+        {searchMarker && (
+          <Marker
+            longitude={searchMarker.coordinates[0]}
+            latitude={searchMarker.coordinates[1]}
+            anchor="center"
+          >
+            <div className="relative flex items-center justify-center pointer-events-none select-none">
+              {/* Pulsing ring */}
+              <div className="absolute w-10 h-10 rounded-full bg-blue-500 animate-ping opacity-20" />
+              {/* Solid dot */}
+              <div className="w-5 h-5 rounded-full bg-blue-600 border-2 border-white shadow-lg relative z-10" />
+              {/* Address label */}
+              <div className="absolute bottom-7 bg-gray-900/90 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap max-w-[200px] truncate left-1/2 -translate-x-1/2">
+                {searchMarker.label.split(',')[0]}
+              </div>
+            </div>
+          </Marker>
         )}
       </Map>
 
