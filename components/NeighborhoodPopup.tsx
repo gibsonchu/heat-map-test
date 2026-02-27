@@ -2,7 +2,7 @@
 
 import { Popup } from 'react-map-gl/maplibre';
 import { NtaFeature } from '@/lib/data';
-import { HVI_COLORS, HVI_LABELS, fmtPct, fmtDollars, fmtPercentile } from '@/lib/color-scale';
+import { HVI_COLORS, HVI_LABELS, fmtPct, fmtDollars, fmtDegF } from '@/lib/color-scale';
 
 interface Props {
   feature: NtaFeature;
@@ -83,11 +83,11 @@ export function NeighborhoodPopup({ feature, longitude, latitude, onClose }: Pro
             <div>
               <DataRow
                 label="Surface temperature"
-                value={fmtPercentile(p.surface_temp)}
+                value={fmtDegF(p.surface_temp)}
               />
               <DataRow
                 label="Green space coverage"
-                value={fmtPercentile(p.green_space)}
+                value={fmtPct(p.green_space)}
               />
               <DataRow
                 label="Households with AC"

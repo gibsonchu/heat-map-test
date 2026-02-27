@@ -53,6 +53,12 @@ export function fmtDollars(val: number | null | undefined): string {
   return `$${Math.round(val).toLocaleString()}`;
 }
 
+/** Format a temperature in degrees Fahrenheit */
+export function fmtDegF(val: number | null | undefined): string {
+  if (val == null) return 'N/A';
+  return `${val.toFixed(1)}°F`;
+}
+
 /** Format a percentile for display */
 export function fmtPercentile(val: number | null | undefined): string {
   if (val == null) return 'N/A';
